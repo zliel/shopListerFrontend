@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import axios from "axios";
-import {Button, Grid, Link, List, ListItemText, TextField, Typography} from "@mui/material";
+import {Button, Divider, Grid, Link, List, ListItem, ListItemText, TextField, Typography} from "@mui/material";
 import {Add} from "@mui/icons-material";
 
 function RecipeScraper() {
@@ -33,8 +33,8 @@ function RecipeScraper() {
     }
 
     return (
-        <Grid container alignSelf={"center"} justify={"center"} direction={"column"} gap={2} paddingTop={"0.5em"}>
-            <Grid item>
+        <Grid container alignSelf={"center"} justify={"center"} direction={"row"} gap={2} paddingTop={"0.5em"}>
+            <Grid item md>
                 <TextField id={"recipe-url-input"}
                            name={"recipe-url"}
                            label={"Recipe URL"}
@@ -43,22 +43,27 @@ function RecipeScraper() {
                            onChange={handleInputChange}
                            fullWidth={true}
                 />
-            </Grid>
-            <Grid item>
-                <Typography variant={"h6"}>Ingredients</Typography>
+                <Typography variant={"h6"} color={"primary"}>Ingredients</Typography>
                 <List>
                     {recipe.ingredients.map((ingredient) => {
                         return <ListItemText primary={ingredient} key={ingredient}/>
                     })}
                 </List>
                 <Typography variant={"h6"}>URL: <Link href={recipe.url} target={"_blank"}>{recipe.url}</Link></Typography>
-            </Grid>
-            <Grid item>
                 <Button variant={"outlined"} onClick={addToShoppingList}><Add /> Add to shopping list</Button>
-                <List>
+            </Grid>
+            <Grid item md>
+
+                <Typography variant={"h6"} color={"primary"}>Shopping List</Typography>
+                <List sx={{height: "auto", maxHeight: 350, overflow: "auto"}}>
                     {shoppingList.map((list) => {
                         return list.map((item) => {
-                            return <ListItemText primary={item} key={item}/>
+                            return <>
+                                <ListItem>
+                                    <ListItemText primary={item} key={item}/>
+                                </ListItem>
+                                <Divider variant={"inset"} />
+                            </>
                         })
                     })}
                 </List>
