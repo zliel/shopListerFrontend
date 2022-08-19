@@ -1,11 +1,9 @@
-import RecipeScraper from "./Components/RecipeScraper";
-import {createTheme, CssBaseline, ThemeProvider} from "@mui/material";
 import {useState} from "react";
 import NavBar from "./Components/NavBar";
 import {BrowserRouter} from "react-router-dom";
 import Home from "./Routes/Home";
 import {useRoutes} from "react-router";
-
+import {createTheme, CssBaseline, ThemeProvider} from "@mui/material";
 
 const lightTheme = createTheme({
     palette: {
@@ -43,7 +41,6 @@ function App() {
 
     const [theme, setTheme] = useState(lightTheme)
     const handleTheme = () => theme === lightTheme ? setTheme(darkTheme) : setTheme(lightTheme)
-
     const AppRoutes = () => useRoutes([
         { path: "/", element: <Home/>},
         { path: "/home", element: <Home/>},
@@ -54,7 +51,6 @@ function App() {
             <CssBaseline />
             <BrowserRouter>
                 <NavBar onThemeSwitch={handleTheme} />
-                <RecipeScraper />
                 <AppRoutes />
             </BrowserRouter>
         </ThemeProvider>
