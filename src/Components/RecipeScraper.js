@@ -2,34 +2,42 @@ import React, {useEffect, useState} from 'react';
 import axios from "axios";
 import {Button, Divider, Grid, Link, List, ListItem, ListItemText, TextField, Typography} from "@mui/material";
 import {Add} from "@mui/icons-material";
+import {useDispatch, useSelector} from "react-redux";
+import {addToShoppingList, changeRecipe, changeRecipeUrl} from "../Slices/RecipeScraperSlice";
 
 function RecipeScraper() {
-    const [recipeUrl, setRecipeUrl] = useState("https://www.justonecookbook.com/tonkatsu/");
-    const [recipe, setRecipe] = useState({ingredients: ["2  boneless pork loin chops (½ inch thick)","½ tsp kosher salt (Diamond Crystal; use half for table salt)","⅛ tsp freshly ground black pepper","3 cups neutral-flavored oil (vegetable, rice bran, canola, etc.)","2 Tbsp all-purpose flour (plain flour)","1  large egg (50 g w/o shell)","½ Tbsp neutral-flavored oil (vegetable, rice bran, canola, etc.)","½ cup panko (Japanese breadcrumbs)","¼ head cabbage","1  Persian or Japanese cucumber","2 Tbsp Japanese sesame dressing","1 Tbsp toasted white sesame seeds","1 Tbsp toasted black sesame seeds","4 Tbsp tonkatsu sauce"], url: "https://www.justonecookbook.com/tonkatsu/"})
-    const [shoppingList, setShoppingList] = useState([]);
-
+    const recipe = useSelector(state => state.recipeScraper)
+    const recipeUrl = useSelector((state) => state.recipeScraper.recipeUrl)
+    const dispatch = useDispatch()
 
     useEffect(() => {
         const fetchIngredients = async () => {
-            const response = await axios.get(`http://localhost:8000/scrape?url=${recipeUrl}`)
-            setRecipe(response.data)
+            const response = await axios.get(`http://localhost:8000/scrape?url=${recipe.recipeUrl}`)
+            // setRecipe(response.data)
+            let responseRecipe = {...recipe, recipe: response.data}
+
+            dispatch(changeRecipe(responseRecipe, recipe))
         }
 
         fetchIngredients()
     }, [recipeUrl]);
 
     const handleInputChange = (e) => {
-        setRecipeUrl(e.target.value)
+        let payload = {...recipe, recipeUrl: e.target.value}
+
+        dispatch(changeRecipeUrl(payload, recipe))
+        // setRecipeUrl(e.target.value)
     }
 
-    const addToShoppingList = () => {
-        for(let arr in shoppingList) {
-            if(recipe.ingredients === shoppingList[arr]) {
+    const handleAdd = () => {
+        for(let arr in recipe.shoppingList) {
+            if(recipe.recipe.ingredients === recipe.shoppingList[arr]) {
                 return
             }
         }
 
-        setShoppingList([...shoppingList, recipe.ingredients])
+        dispatch(addToShoppingList(recipe, recipe.recipe.ingredients))
+        // setShoppingList([...shoppingList, recipe.ingredients])
     }
 
     return (
@@ -39,30 +47,34 @@ function RecipeScraper() {
                            name={"recipe-url"}
                            label={"Recipe URL"}
                            type={"text"}
-                           value={recipeUrl}
+                           value={recipe.recipeUrl}
                            onChange={handleInputChange}
                            fullWidth={true}
                 />
                 <Typography variant={"h6"} color={"primary"}>Ingredients</Typography>
-                <List>
-                    {recipe.ingredients.map((ingredient) => {
-                        return <ListItemText primary={ingredient} key={ingredient}/>
+                <List sx={{height: "auto", maxHeight: "60%", overflow: "auto"}}>
+                    {recipe.recipe.ingredients.map((ingredient) => {
+                        return <><ListItem>
+                            <ListItemText primary={ingredient} key={ingredient}/>
+                        </ListItem>
+                        <Divider variant={"middle"} />
+                        </>
                     })}
                 </List>
-                <Typography variant={"h6"}>URL: <Link href={recipe.url} target={"_blank"}>{recipe.url}</Link></Typography>
-                <Button variant={"outlined"} onClick={addToShoppingList}><Add /> Add to shopping list</Button>
+                <Typography variant={"h6"}>URL: <Link href={recipe.recipeUrl} target={"_blank"}>{recipe.recipeUrl}</Link></Typography>
+                <Button variant={"outlined"} onClick={handleAdd}><Add /> Add to shopping list</Button>
             </Grid>
             <Grid item md>
 
                 <Typography variant={"h6"} color={"primary"}>Shopping List</Typography>
-                <List sx={{height: "auto", maxHeight: 350, overflow: "auto"}}>
-                    {shoppingList.map((list) => {
+                <List sx={{height: "auto", maxHeight: "50%", overflow: "auto"}}>
+                    {recipe.shoppingList.map((list) => {
                         return list.map((item) => {
                             return <>
                                 <ListItem>
                                     <ListItemText primary={item} key={item}/>
                                 </ListItem>
-                                <Divider variant={"inset"} />
+                                <Divider variant={"middle"} />
                             </>
                         })
                     })}
