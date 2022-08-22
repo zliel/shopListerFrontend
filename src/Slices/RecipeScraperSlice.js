@@ -13,6 +13,8 @@ export const recipeScraperSlice = createSlice({
     reducers: {
         changeRecipe: (state, action) => {
             state.recipe = action.payload.recipe
+            // Consider changing the handling of the input to something like "onEnter" to avoid infinite looping
+            if(state.recipeUrl !== action.payload.recipeUrl) state.recipeUrl = action.payload.recipeUrl
         },
         changeRecipeUrl: (state, action) => {
             state.recipeUrl = action.payload.recipeUrl

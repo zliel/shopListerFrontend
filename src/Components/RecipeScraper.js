@@ -14,9 +14,11 @@ function RecipeScraper() {
         const fetchIngredients = async () => {
             const response = await axios.get(`http://localhost:8000/scrape?url=${recipe.recipeUrl}`)
             // setRecipe(response.data)
-            let responseRecipe = {...recipe, recipe: response.data}
+            let responseRecipe = {...recipe, recipe: response.data, recipeUrl: response.data.url}
+            console.log(responseRecipe)
 
             dispatch(changeRecipe(responseRecipe, recipe))
+
         }
 
         fetchIngredients()
