@@ -19,7 +19,9 @@ export const recipeScraperSlice = createSlice({
 
         },
         addToShoppingList: (state, action) => {
-            state.shoppingList = [...state.shoppingList, action.payload.recipe.ingredients]
+            // console.log(action.payload)
+            state.shoppingList = [...state.shoppingList, action.payload.recipe]
+            console.log(state.shoppingList)
         }
     }
 })

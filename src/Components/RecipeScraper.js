@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect} from 'react';
 import axios from "axios";
 import {Button, Divider, Grid, Link, List, ListItem, ListItemText, TextField, Typography} from "@mui/material";
 import {Add} from "@mui/icons-material";
@@ -29,14 +29,15 @@ function RecipeScraper() {
         // setRecipeUrl(e.target.value)
     }
 
+
     const handleAdd = () => {
         for(let arr in recipe.shoppingList) {
-            if(recipe.recipe.ingredients === recipe.shoppingList[arr]) {
+            if(recipe.recipe.url === recipe.shoppingList[arr]["url"]) {
                 return
             }
         }
-
-        dispatch(addToShoppingList(recipe, recipe.recipe.ingredients))
+        const recipeToAdd = {"url": recipe.recipe.url, "ingredients": recipe.recipe.ingredients}
+        dispatch(addToShoppingList(recipe, recipeToAdd))
         // setShoppingList([...shoppingList, recipe.ingredients])
     }
 
@@ -69,7 +70,7 @@ function RecipeScraper() {
                 <Typography variant={"h6"} color={"primary"}>Shopping List</Typography>
                 <List sx={{height: "auto", maxHeight: "50%", overflow: "auto"}}>
                     {recipe.shoppingList.map((list) => {
-                        return list.map((item) => {
+                        return list["ingredients"].map((item) => {
                             return <>
                                 <ListItem>
                                     <ListItemText primary={item} key={item}/>
