@@ -1,34 +1,39 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import axios from "axios";
-import {Button, Divider, Grid, Link, List, ListItem, ListItemText, TextField, Typography} from "@mui/material";
+import {Button, Divider, Grid, Link, List, ListItem, ListItemText, Stack, TextField, Typography} from "@mui/material";
 import {Add} from "@mui/icons-material";
 import {useDispatch, useSelector} from "react-redux";
 import {addToShoppingList, changeRecipe, changeRecipeUrl} from "../Slices/RecipeScraperSlice";
 
 function RecipeScraper() {
     const recipe = useSelector(state => state.recipeScraper)
-    const recipeUrl = useSelector((state) => state.recipeScraper.recipeUrl)
     const dispatch = useDispatch()
+    const [inputUrl, setInputUrl] = useState(recipe.recipeUrl);
 
     useEffect(() => {
         const fetchIngredients = async () => {
-            const response = await axios.get(`http://localhost:8000/scrape?url=${recipe.recipeUrl}`)
+            const response = await axios.get(`http://localhost:8000/scrape?url=${inputUrl}`)
             // setRecipe(response.data)
             let responseRecipe = {...recipe, recipe: response.data, recipeUrl: response.data.url}
-            console.log(responseRecipe)
 
             dispatch(changeRecipe(responseRecipe, recipe))
-
+            setInputUrl(recipe.recipeUrl)
         }
 
         fetchIngredients()
-    }, [recipeUrl]);
+    }, [recipe.recipeUrl]);
+
 
     const handleInputChange = (e) => {
-        let payload = {...recipe, recipeUrl: e.target.value}
+        setInputUrl(e.target.value)
+    }
+
+
+    const handleSubmit = (e) => {
+        e.preventDefault()
+        let payload = {...recipe, recipeUrl: inputUrl}
 
         dispatch(changeRecipeUrl(payload, recipe))
-        // setRecipeUrl(e.target.value)
     }
 
 
@@ -40,20 +45,26 @@ function RecipeScraper() {
         }
         const recipeToAdd = {"url": recipe.recipe.url, "ingredients": recipe.recipe.ingredients}
         dispatch(addToShoppingList(recipe, recipeToAdd))
-        // setShoppingList([...shoppingList, recipe.ingredients])
     }
+
 
     return (
         <Grid container alignSelf={"center"} justify={"center"} direction={"row"} gap={2} paddingTop={"0.5em"}>
-            <Grid item md>
-                <TextField id={"recipe-url-input"}
-                           name={"recipe-url"}
-                           label={"Recipe URL"}
-                           type={"text"}
-                           value={recipe.recipeUrl}
-                           onChange={handleInputChange}
-                           fullWidth={true}
-                />
+            <Grid item lg>
+                <form onSubmit={handleSubmit}>
+                    <Stack direction={"row"}>
+                        <TextField id={"recipe-url-input"}
+                                   name={"recipe-url"}
+                                   label={"Recipe URL"}
+                                   type={"text"}
+                                   value={inputUrl}
+                                   onChange={handleInputChange}
+                                   fullWidth={true}
+                        />
+                        <Button variant={"outlined"} sx={{width: "20%"}} type={"submit"}>Submit</Button>
+                    </Stack>
+                </form>
+
                 <Typography variant={"h6"} color={"primary"}>Ingredients</Typography>
                 <List sx={{height: "auto", maxHeight: "60%", overflow: "auto"}}>
                     {recipe.recipe.ingredients.map((ingredient) => {

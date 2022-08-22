@@ -13,7 +13,10 @@ export const recipeScraperSlice = createSlice({
     reducers: {
         changeRecipe: (state, action) => {
             state.recipe = action.payload.recipe
-            // Consider changing the handling of the input to something like "onEnter" to avoid infinite looping
+
+            // Because the JOC website autocompletes incomplete urls to the closest recipes,
+            // we need to change the recipeUrl here to match what comes back as the final url
+            // from the api
             if(state.recipeUrl !== action.payload.recipeUrl) state.recipeUrl = action.payload.recipeUrl
         },
         changeRecipeUrl: (state, action) => {
@@ -21,9 +24,7 @@ export const recipeScraperSlice = createSlice({
 
         },
         addToShoppingList: (state, action) => {
-            // console.log(action.payload)
             state.shoppingList = [...state.shoppingList, action.payload.recipe]
-            console.log(state.shoppingList)
         }
     }
 })
